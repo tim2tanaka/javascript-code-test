@@ -1,4 +1,4 @@
-import { xmlParser } from '../helper/xmlParser';
+import { xmlParser } from '../helper/xmlParser.js';
 
 describe('Parse xml', () => {
   const xmlData = `
@@ -75,10 +75,10 @@ describe('Parse xml', () => {
   const xmlOptions = {
     ignoreAttributes: true,
   };
-  test('returns books', () => {
+  it('returns books', () => {
     expect(xmlParser(xmlData, xmlOptions)).toEqual(expectedBooks);
   });
-  test('fails to returns books', () => {
+  it('fails to returns books', () => {
     const xmlData = `
         bookstore>
          <book>

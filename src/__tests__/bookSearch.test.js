@@ -279,11 +279,22 @@ describe('BookSearch', () => {
         expect(books).toEqual(null);
         fetch.mockRestore();
       });
+      it('returns books when getBooks is called with pagination', async () => {
+        jest.spyOn(global, 'fetch').mockImplementationOnce(() =>
+          Promise.resolve({
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(expectedBooks),
+          })
+        );
+        const pagination = { status: true, page: 1, booksPerPage: 10 };
+        const client = new BookSearchApi(baseUrl, responseType);
+        const books = await client.getBooks(limit, pagination);
+        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(books).toEqual(expectedBooks);
+      });
     });
     describe('get xml data', () => {
-      beforeEach(() => {
-        jest.clearAllMocks();
-      });
       const expectedBooks = [
         {
           id: 1,
@@ -392,13 +403,6 @@ describe('BookSearch', () => {
         expect(xmlParser).toHaveBeenCalledTimes(1);
         expect(books).toEqual(expectedBooks);
       });
-      it.skip('fails to returns books when getBooks is called', async () => {
-        xmlParser.mockReturnValue(expectedBooks);
-        const client = new BookSearchApi(baseUrl, responseType);
-        const books = await client.getBooks(limit);
-        expect(xmlParser).toHaveBeenCalledTimes(1);
-        expect(books).toEqual(null);
-      });
       it('returns books when getBooksBy "arthor" is called', async () => {
         xmlParser.mockReturnValue(Array(expectedBooks[1]));
         const searchType = 'author';
@@ -493,6 +497,21 @@ describe('BookSearch', () => {
         const books = await client.getBooksBy(searchType, search, limit);
         expect(xmlParser).toHaveBeenCalledTimes(0);
         expect(books).toEqual(null);
+      });
+      it('returns books when getBooksby "arthor" is called with pagination', async () => {
+        xmlParser.mockReturnValue(expectedBooks);
+        const searchType = 'author';
+        const search = 'George Orwell';
+        const client = new BookSearchApi(baseUrl, responseType);
+        const pagination = { status: true, page: 1, booksPerPage: 10 };
+        const books = await client.getBooksBy(
+          searchType,
+          search,
+          limit,
+          pagination
+        );
+        expect(xmlParser).toHaveBeenCalledTimes(1);
+        expect(books).toEqual(expectedBooks);
       });
     });
   });

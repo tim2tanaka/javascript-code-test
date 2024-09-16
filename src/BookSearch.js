@@ -1,12 +1,13 @@
 import { fetchApi } from './helper/fetchApi.js';
 import { xmlParser } from './helper/xmlParser.js';
+import { booksPagination } from './helper/pagination.js';
 
 export class BookSearchApi {
   constructor(baseUrl, responseType) {
     this.baseUrl = baseUrl;
     this.responseType = responseType;
   }
-  getBooks = async (limit = 50) => {
+  getBooks = async (limit = 50, pagination) => {
     const url = `${this.baseUrl}/books/?limit=${limit}`;
     const fetchOptions = {
       method: 'GET',
@@ -19,10 +20,14 @@ export class BookSearchApi {
     };
     const resData = await fetchApi(url, fetchOptions);
     if (resData) {
-      const books =
+      let books =
         this.responseType === 'application/xml'
           ? xmlParser(resData, xmlOptions)
           : resData;
+      books =
+        pagination && pagination.status
+          ? booksPagination(books, pagination)
+          : books;
       return books.map((book) => {
         return {
           id: book.id,
@@ -42,7 +47,7 @@ export class BookSearchApi {
     return null;
   };
 
-  getBooksBy = async (searchType, search, limit) => {
+  getBooksBy = async (searchType, search, limit, pagination) => {
     let url = null;
     if (searchType === 'author')
       url = `${this.baseUrl}/${search}?limit=${limit}`;
@@ -63,11 +68,15 @@ export class BookSearchApi {
       ignoreAttributes: true,
     };
     const resData = await fetchApi(url, fetchOptions);
-    const books =
+    let books =
       this.responseType === 'application/xml'
         ? xmlParser(resData, xmlOptions)
         : resData;
     if (books) {
+      books =
+        pagination && pagination.status
+          ? booksPagination(books, pagination)
+          : books;
       return books.map((book) => {
         return {
           id: book.id,
