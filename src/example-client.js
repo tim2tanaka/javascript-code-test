@@ -1,11 +1,15 @@
-import { BookSearchApi1, BookSearchApi2 } from './BookSearchApi.js';
+import { BookSearchApi } from './BookSearch.js';
 
 // BookSearchApi1
-const client1 = new BookSearchApi1();
-const books1 = await client1.getBooks(10);
-console.log(books1);
+const responseType1 = 'application/json';
+const baseUrl1 = 'https://freetestapi.com/api/v1/';
+const api1 = new BookSearchApi(baseUrl1, responseType1);
+const books1 = await api1.getBooks(10);
+console.log('books: ', books1);
 
 // BookSearchApi2
-// const client2 = new BookSearchApi2();
-// const books2 = await client2.getBooksBy('books', '2000', 10);
+// const responseType2 = 'application/xml'
+// const baseUrl2 = 'https://freetestapi.com/api/v1/authors';
+// const api2 = new BookSearchApi(baseUrl2, responseType2);
+// const books2 = await api2.getBooksBy('author', 'Shakespeare', 10);
 // console.log(books2);
